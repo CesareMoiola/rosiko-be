@@ -1,0 +1,502 @@
+[
+	{
+		"id": "eastern_australia",
+		"name": "Eastern Australia",
+		"continentId": "oceania",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"new_guinea",
+			"western_australia"
+		]
+	},
+	{
+		"id": "indonesia",
+		"name": "Indonesia",
+		"continentId": "oceania",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"siam",
+			"new_guinea",
+			"western_australia"
+		]
+	},
+	{
+		"id": "new_guinea",
+		"name": "New Guinea",
+		"continentId": "oceania",
+		"cardType": "FARMER",
+		"neighboring": [
+			"indonesia",
+			"western_australia",
+			"eastern_australia"
+		]
+	},
+	{
+		"id": "alaska",
+		"name": "Alaska",
+		"continentId": "north_america",
+		"cardType": "FARMER",
+		"neighboring": [
+			"northwest_territory",
+			"alberta",
+			"kamchatka"
+		]
+	},
+	{
+		"id": "ontario",
+		"name": "Ontario",
+		"continentId": "north_america",
+		"cardType": "COW",
+		"neighboring": [
+			"northwest_territory",
+			"quebec",
+			"eastern_united_states",
+			"western_united_states",
+			"alberta",
+			"greenland"
+		]
+	},
+	{
+		"id": "northwest_territory",
+		"name": "Northwest Territory",
+		"continentId": "north_america",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"alaska",
+			"alberta",
+			"ontario",
+			"greenland"
+		]
+	},
+	{
+		"id": "venezuela",
+		"name": "Venezuela",
+		"continentId": "south_america",
+		"cardType": "FARMER",
+		"neighboring": [
+			"central_america",
+			"peru",
+			"brazil"
+		]
+	},
+	{
+		"id": "madagascar",
+		"name": "Madagascar",
+		"continentId": "africa",
+		"cardType": "COW",
+		"neighboring": [
+			"east_africa",
+			"south_africa"
+		]
+	},
+	{
+		"id": "north_africa",
+		"name": "North Africa",
+		"continentId": "africa",
+		"cardType": "COW",
+		"neighboring": [
+			"brazil",
+			"western_europe",
+			"southern_europe",
+			"egypt",
+			"east_africa",
+			"congo"
+		]
+	},
+	{
+		"id": "greenland",
+		"name": "Greenland",
+		"continentId": "north_america",
+		"cardType": "COW",
+		"neighboring": [
+			"iceland",
+			"quebec",
+			"ontario",
+			"northwest_territory"
+		]
+	},
+	{
+		"id": "iceland",
+		"name": "Iceland",
+		"continentId": "europe",
+		"cardType": "FARMER",
+		"neighboring": [
+			"greenland",
+			"great_britain",
+			"scandinavia"
+		]
+	},
+	{
+		"id": "great_britain",
+		"name": "Great Britain",
+		"continentId": "europe",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"iceland",
+			"scandinavia",
+			"northern_europe",
+			"western_europe"
+		]
+	},
+	{
+		"id": "scandinavia",
+		"name": "Scandinavia",
+		"continentId": "europe",
+		"cardType": "COW",
+		"neighboring": [
+			"ukraine",
+			"northern_europe",
+			"great_britain",
+			"iceland"
+		]
+	},
+	{
+		"id": "japan",
+		"name": "Japan",
+		"continentId": "asia",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"kamchatka",
+			"mongolia"
+		]
+	},
+	{
+		"id": "yakursk",
+		"name": "Yakursk",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"kamchatka",
+			"irkutsk",
+			"siberia"
+		]
+	},
+	{
+		"id": "kamchatka",
+		"name": "Kamchatka",
+		"continentId": "asia",
+		"cardType": "FARMER",
+		"neighboring": [
+			"alaska",
+			"yakursk",
+			"irkutsk",
+			"mongolia",
+			"japan"
+		]
+	},
+	{
+		"id": "siberia",
+		"name": "Siberia",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"ural",
+			"china",
+			"mongolia",
+			"irkutsk",
+			"yakursk"
+		]
+	},
+	{
+		"id": "ural",
+		"name": "Ural",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"ukraine",
+			"afghanistan",
+			"china",
+			"siberia"
+		]
+	},
+	{
+		"id": "afghanistan",
+		"name": "Afghanistan",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"ural",
+			"ukraine",
+			"middle_east",
+			"india",
+			"china"
+		]
+	},
+	{
+		"id": "middle_east",
+		"name": "Middle East",
+		"continentId": "asia",
+		"cardType": "FARMER",
+		"neighboring": [
+			"ukraine",
+			"southern_europe",
+			"egypt",
+			"india",
+			"afghanistan"
+		]
+	},
+	{
+		"id": "india",
+		"name": "India",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"afghanistan",
+			"middle_east",
+			"siam",
+			"china"
+		]
+	},
+	{
+		"id": "siam",
+		"name": "Siam",
+		"continentId": "asia",
+		"cardType": "FARMER",
+		"neighboring": [
+			"china",
+			"india",
+			"indonesia"
+		]
+	},
+	{
+		"id": "china",
+		"name": "China",
+		"continentId": "asia",
+		"cardType": "FARMER",
+		"neighboring": [
+			"mongolia",
+			"siberia",
+			"ural",
+			"afghanistan",
+			"india",
+			"siam"
+		]
+	},
+	{
+		"id": "mongolia",
+		"name": "Mongolia",
+		"continentId": "asia",
+		"cardType": "FARMER",
+		"neighboring": [
+			"irkutsk",
+			"siberia",
+			"china",
+			"japan",
+			"kamchatka"
+		]
+	},
+	{
+		"id": "irkutsk",
+		"name": "Irkutsk",
+		"continentId": "asia",
+		"cardType": "COW",
+		"neighboring": [
+			"yakursk",
+			"siberia",
+			"mongolia",
+			"kamchatka"
+		]
+	},
+	{
+		"id": "ukraine",
+		"name": "Ukraine",
+		"continentId": "europe",
+		"cardType": "COW",
+		"neighboring": [
+			"scandinavia",
+			"northern_europe",
+			"southern_europe",
+			"middle_east",
+			"afghanistan",
+			"ural"
+		]
+	},
+	{
+		"id": "southern_europe",
+		"name": "Southern Europe",
+		"continentId": "europe",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"northern_europe",
+			"western_europe",
+			"north_africa",
+			"egypt",
+			"middle_east",
+			"ukraine"
+		]
+	},
+	{
+		"id": "western_europe",
+		"name": "Western Europe",
+		"continentId": "europe",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"great_britain",
+			"north_africa",
+			"southern_europe",
+			"northern_europe"
+		]
+	},
+	{
+		"id": "northern_europe",
+		"name": "Northern Europe",
+		"continentId": "europe",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"scandinavia",
+			"great_britain",
+			"western_europe",
+			"southern_europe",
+			"ukraine"
+		]
+	},
+	{
+		"id": "egypt",
+		"name": "Egypt",
+		"continentId": "africa",
+		"cardType": "FARMER",
+		"neighboring": [
+			"southern_europe",
+			"north_africa",
+			"east_africa",
+			"middle_east"
+		]
+	},
+	{
+		"id": "east_africa",
+		"name": "East Africa",
+		"continentId": "africa",
+		"cardType": "FARMER",
+		"neighboring": [
+			"egypt",
+			"north_africa",
+			"congo",
+			"south_africa",
+			"madagascar"
+		]
+	},
+	{
+		"id": "congo",
+		"name": "Congo",
+		"continentId": "africa",
+		"cardType": "FARMER",
+		"neighboring": [
+			"north_africa",
+			"south_africa",
+			"east_africa"
+		]
+	},
+	{
+		"id": "south_africa",
+		"name": "South Africa",
+		"continentId": "africa",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"congo",
+			"madagascar",
+			"east_africa"
+		]
+	},
+	{
+		"id": "brazil",
+		"name": "Brazil",
+		"continentId": "south_america",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"venezuela",
+			"peru",
+			"argentina",
+			"north_africa"
+		]
+	},
+	{
+		"id": "argentina",
+		"name": "Argentina",
+		"continentId": "south_america",
+		"cardType": "FARMER",
+		"neighboring": [
+			"peru",
+			"brazil"
+		]
+	},
+	{
+		"id": "eastern_united_states",
+		"name": "Eastern United States",
+		"continentId": "north_america",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"ontario",
+			"western_united_states",
+			"central_america",
+			"quebec"
+		]
+	},
+	{
+		"id": "western_united_states",
+		"name": "Western United States",
+		"continentId": "north_america",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"alberta",
+			"ontario",
+			"eastern_united_states",
+			"central_america"
+		]
+	},
+	{
+		"id": "quebec",
+		"name": "Quebec",
+		"continentId": "north_america",
+		"cardType": "COW",
+		"neighboring": [
+			"greenland",
+			"eastern_united_states",
+			"ontario"
+		]
+	},
+	{
+		"id": "central_america",
+		"name": "Central America",
+		"continentId": "north_america",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"western_united_states",
+			"eastern_united_states",
+			"venezuela"
+		]
+	},
+	{
+		"id": "peru",
+		"name": "Peru",
+		"continentId": "south_america",
+		"cardType": "FARMER",
+		"neighboring": [
+			"venezuela",
+			"brazil",
+			"argentina"
+		]
+	},
+	{
+		"id": "western_australia",
+		"name": "Western Australia",
+		"continentId": "oceania",
+		"cardType": "TRACTOR",
+		"neighboring": [
+			"indonesia",
+			"new_guinea",
+			"eastern_australia"
+		]
+	},
+	{
+		"id": "alberta",
+		"name": "Alberta",
+		"continentId": "north_america",
+		"cardType": "COW",
+		"neighboring": [
+			"northwest_territory",
+			"ontario",
+			"western_united_states",
+			"alaska"
+		]
+	}
+]

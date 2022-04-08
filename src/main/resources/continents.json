@@ -1,0 +1,38 @@
+[
+	{
+		"id": "europe",
+		"name": "Europe",
+		"bonusArmies": 5,
+		"territories": ["great_britain", "iceland", "northern_europe", "scandinavia", "southern_europe", "ukraine", "western_europe"]
+	},
+	{
+		"id": "north_america",
+		"name": "North America",
+		"bonusArmies": 5,
+		"territories": ["alaska", "alberta", "central_america", "eastern_united_states", "greenland", "northwest_territory", "ontario", "quebec", "western_united_states"]
+	},
+	{
+		"id": "south_america",
+		"name": "South America",
+		"bonusArmies": 2,
+		"territories": ["argentina", "brazil", "peru", "venezuela"]
+	},
+	{
+		"id": "asia",
+		"name": "Asia",
+		"bonusArmies": 7,
+		"territories": ["afghanistan", "china", "india", "irkutsk", "japan", "kamchatka", "middle_east", "mongolia", "siam", "siberia", "ural", "yakursk"]
+	},
+	{
+		"id": "africa",
+		"name": "Africa",
+		"bonusArmies": 3,
+		"territories": ["congo", "east_africa", "egypt", "madagascar", "north_africa", "south_africa"]
+	},
+	{
+		"id": "oceania",
+		"name": "Oceania",
+		"bonusArmies": 2,
+		"territories": ["eastern_australia", "indonesia", "new_guinea", "western_australia"]
+	}
+]

@@ -1,0 +1,15 @@
+[
+  {"id": "mission_01", "description":  "Capture Europe, Australia and one other continent"},
+  {"id": "mission_02", "description":  "Capture Europe, South America and one other continent"},
+  {"id": "mission_03", "description":  "capture North America and Africa"},
+  {"id": "mission_04", "description":  "capture Asia and South America"},
+  {"id": "mission_05", "description":  "capture North America and Australia"},
+  {"id": "mission_06", "description":  "capture 24 territories"},
+  {"id": "mission_07", "description":  "Capture 18 territories and occupy each with two troops"},
+  {"id": "mission_08", "description":  "destroy all armies of red opponent or, in the case of being the named player oneself, to capture 24 territories"},
+  {"id": "mission_09", "description":  "destroy all armies of yellow opponent or, in the case of being the named player oneself, to capture 24 territories"},
+  {"id": "mission_10", "description":  "destroy all armies of black opponent or, in the case of being the named player oneself, to capture 24 territories"},
+  {"id": "mission_11", "description":  "destroy all armies of blue opponent or, in the case of being the named player oneself, to capture 24 territories"},
+  {"id": "mission_12", "description":  "destroy all armies of green opponent or, in the case of being the named player oneself, to capture 24 territories"},
+  {"id": "mission_13", "description":  "destroy all armies of purple opponent or, in the case of being the named player oneself, to capture 24 territories"}
+]
