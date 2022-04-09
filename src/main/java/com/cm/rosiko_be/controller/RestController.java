@@ -17,25 +17,25 @@ public class RestController {
     @Autowired
     WSServices wsService;
 
-    @PostMapping("/update")
+    @GetMapping("/update")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateMatch(@RequestBody Match match){
         MatchesController.updateMatch(match);
     }
 
-    @PostMapping("/joinable_matches")
+    @GetMapping("/joinable_matches")
     public static List<Match> getJoinableMatches(){
 
         return MatchesController.getJoinableMatches();
     }
 
-    @PostMapping("/get_match")
-    public Match getMatch(@RequestBody Map<String, String> json){
-        Match targetMatch = MatchesController.getMatch(Long.parseLong(json.get("matchId")));
+    @GetMapping("/get_match")
+    public Match getMatch(@RequestParam String matchId){
+        Match targetMatch = MatchesController.getMatch(Long.parseLong(matchId));
         return targetMatch;
     }
 
-    @PostMapping("/get_player")
+    @GetMapping("/get_player")
     public Player getPlayer(@RequestBody Map<String, String> json){
         Match match = MatchesController.getMatch(Long.parseLong(json.get("matchId")));
         String playerId = json.get("playerId");
@@ -50,7 +50,7 @@ public class RestController {
         return targetPlayer;
     }
 
-    @PostMapping("/get_players")
+    @GetMapping("/get_players")
     public List<Player> getPlayers(@RequestBody Map<String, String> json){
         Match match = MatchesController.getMatch(Long.parseLong(json.get("matchId")));
         return match.getPlayers();
