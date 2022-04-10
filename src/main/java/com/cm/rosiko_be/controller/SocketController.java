@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
 import java.util.Map;
 
+
 /*Questa classe si occupa di recepire i messaggi arrivati tramite websocket e rispondere*/
-@CrossOrigin(origins = "https://rosiko-fe.herokuapp.com")
 @Controller
 public class SocketController {
 
