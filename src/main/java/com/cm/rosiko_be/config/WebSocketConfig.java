@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp")
                 .setHandshakeHandler(new UserHandshakeHandler())
-                .setAllowedOrigins("https://rosiko-fe.herokuapp.com")
+                .setAllowedOrigins(EndPoint.FRONTEND)
                 .withSockJS();
     }
 }

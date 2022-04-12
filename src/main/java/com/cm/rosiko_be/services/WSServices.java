@@ -12,21 +12,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class WSServices {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    public SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public WSServices(SimpMessagingTemplate messagingTemplate){
-        this.messagingTemplate=messagingTemplate;
-    }
+    public MatchesController matchesController;
 
     //Manda come messaggio la lista di joinableMatches
     public void notifyJoinableMatches (){
-        messagingTemplate.convertAndSend("/queue/joinableMatches", RestController.getJoinableMatches());
+        messagingTemplate.convertAndSend("/queue/joinableMatches", matchesController.getJoinableMatches());
     }
 
     //Manda il match aggiornato ai players iscritti escluso quello passato come parametro
     public void notifyMatch (long matchId, String playerId){
-        Match match = MatchesController.getMatch(matchId);
+        Match match = matchesController.getMatch(matchId);
 
         for(Player player : match.getPlayers())
         {
@@ -38,7 +37,7 @@ public class WSServices {
 
     //Manda il match aggiornato ai players iscritti
     public void notifyMatch (long matchId){
-        Match match = MatchesController.getMatch(matchId);
+        Match match = matchesController.getMatch(matchId);
 
         for(Player player : match.getPlayers())
         {

@@ -1,10 +1,14 @@
 package com.cm.rosiko_be.data;
 
 import com.cm.rosiko_be.controller.MatchController;
+import com.cm.rosiko_be.services.TimerService;
 import com.cm.rosiko_be.enums.Color;
 import com.cm.rosiko_be.enums.MatchState;
 import com.cm.rosiko_be.enums.Stage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,16 +35,21 @@ public class Match {
     private Player winner = null;
     private List<Card> cards = new ArrayList<>();
 
+    @JsonIgnore
+    private TimerService timerService = new TimerService();
+
     public Match(long id, String name) {
-        this.id = id;
         this.name = name;
+        this.id = id;
         this.state = MatchState.WAITING;
-        date = new Date(System.currentTimeMillis());
+        Calendar cal = Calendar.getInstance();
+        date = cal.getTime();
     }
 
 
     public void addNewPlayer(String name, String id) throws Exception {
-        if (players.size()>= MatchController.MAX_PLAYERS) throw new Exception("Cannot add new player because max players are " + MatchController.MAX_PLAYERS);
+        if (players.size() >= MatchController.MAX_PLAYERS)
+            throw new Exception("Cannot add new player because max players are " + MatchController.MAX_PLAYERS);
 
         //Inizializza la lista colorsTaken con tutti i colori utilizzati dagli altri giocatori
         List<Color> colorsTaken = new ArrayList<Color>();
@@ -53,7 +62,8 @@ public class Match {
 
         players.add(player);
 
-        if( players.size() >= MatchController.MIN_PLAYERS  && this.state == MatchState.WAITING )   this.state = MatchState.READY;
+        if (players.size() >= MatchController.MIN_PLAYERS && this.state == MatchState.WAITING)
+            this.state = MatchState.READY;
     }
 
     public long getId() {
@@ -64,7 +74,9 @@ public class Match {
         return state;
     }
 
-    public void setState(MatchState state){ this.state = state;}
+    public void setState(MatchState state) {
+        this.state = state;
+    }
 
     public void setPassword(String password) {
         this.password = password;
@@ -74,7 +86,9 @@ public class Match {
         return players;
     }
 
-    public void setPlayers(List<Player> players){ this.players = players;}
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
 
     public GameMap getMap() {
         return map;
@@ -224,46 +238,67 @@ public class Match {
         this.cards = cards;
     }
 
-    public Card getCard(int id){
+    public Card getCard(int id) {
         Card card = null;
 
-        for(Card currentCard : cards){
-            if(currentCard.getId() == id) card = currentCard;
+        for (Card currentCard : cards) {
+            if (currentCard.getId() == id) card = currentCard;
         }
         return card;
     }
 
+    public TimerService getTimerService() {
+        return timerService;
+    }
+
+    public void setTimerService(TimerService timerService) {
+        this.timerService = timerService;
+    }
+
+
     //Ritorna tutti i continenti posseduti interamente dal player
-    public List<Continent> getContinentsOwned(Player player){
+    public List<Continent> getContinentsOwned(Player player) {
         List<Continent> continentsOwned = new ArrayList<>();
 
-        for(Continent continent : map.getContinents()){
+        for (Continent continent : map.getContinents()) {
             boolean isContinentOwned = true;
-            for (Territory territory:  map.getTerritories()) {
+            for (Territory territory : map.getTerritories()) {
                 //Il proprietario del territorio è diverso dal giocatore
-                if(     territory.getContinentId().equals(continent.getId())
+                if (territory.getContinentId().equals(continent.getId())
                         && !territory.getOwner().equals(player)
-                ){
+                ) {
                     isContinentOwned = false;
                     break;
                 }
             }
-            if(isContinentOwned) continentsOwned.add(continent);
+            if (isContinentOwned) continentsOwned.add(continent);
         }
 
         return continentsOwned;
     }
 
     //Ritorna tutti i territori posseduti dal player
-    public List<Territory> getTerritoriesOwned(Player player){
+    public List<Territory> getTerritoriesOwned(Player player) {
         List<Territory> territoriesOwned = new ArrayList<>();
 
-        for(Territory territory : map.getTerritories()){
-            if( territory.getOwner().equals(player) ){
+        for (Territory territory : map.getTerritories()) {
+            if (territory.getOwner().equals(player)) {
                 territoriesOwned.add(territory);
             }
         }
 
         return territoriesOwned;
+    }
+
+    //Ritorna la lista di giocatori attivi
+    public List<Player> getActivePlayers(){
+        List<Player> activePlayers = new ArrayList<>();
+        List<Player> players = this.players;
+
+        for(Player player : players){
+            if(player.isActive()) activePlayers.add(player);
+        }
+
+        return activePlayers;
     }
 }

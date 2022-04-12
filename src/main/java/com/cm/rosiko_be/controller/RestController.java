@@ -9,34 +9,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
 @org.springframework.web.bind.annotation.RestController
-@RequestMapping(path = "match")
 public class RestController {
 
     @Autowired
-    WSServices wsService;
+    MatchesController matchesController;
+
 
     @GetMapping("/update")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateMatch(@RequestBody Match match){
-        MatchesController.updateMatch(match);
+        matchesController.updateMatch(match);
     }
 
     @GetMapping("/joinable_matches")
-    public static List<Match> getJoinableMatches(){
-
-        return MatchesController.getJoinableMatches();
+    public List<Match> getJoinableMatches(){
+        return matchesController.getJoinableMatches();
     }
 
     @GetMapping("/get_match")
     public Match getMatch(@RequestParam String matchId){
-        Match targetMatch = MatchesController.getMatch(Long.parseLong(matchId));
+        Match targetMatch = matchesController.getMatch(Long.parseLong(matchId));
         return targetMatch;
     }
 
     @GetMapping("/get_player")
     public Player getPlayer(@RequestBody Map<String, String> json){
-        Match match = MatchesController.getMatch(Long.parseLong(json.get("matchId")));
+        Match match = matchesController.getMatch(Long.parseLong(json.get("matchId")));
         String playerId = json.get("playerId");
         Player targetPlayer = null;
 
@@ -51,7 +51,7 @@ public class RestController {
 
     @GetMapping("/get_players")
     public List<Player> getPlayers(@RequestBody Map<String, String> json){
-        Match match = MatchesController.getMatch(Long.parseLong(json.get("matchId")));
+        Match match = matchesController.getMatch(Long.parseLong(json.get("matchId")));
         return match.getPlayers();
     }
 }
