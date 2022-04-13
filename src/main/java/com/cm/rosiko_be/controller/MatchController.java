@@ -18,7 +18,7 @@ public class MatchController {
 
     public static final int MAX_PLAYERS = 6;                //Massimo numero di giocatori
     public static final int MIN_PLAYERS = 1;                //Minimo numero di giocatori
-    public static final int INITIAL_ARMIES_2_PLAYERS = 25;  // !!! DELETE !!!
+    public static final int INITIAL_ARMIES_2_PLAYERS = 24;  // !!! DELETE !!!
     public static final int INITIAL_ARMIES_3_PLAYERS = 35;  //Armate che ha a disposizione il giocatore a inizio partita nel caso in cui ci fossero 3 giocatori
     public static final int INITIAL_ARMIES_4_PLAYERS = 30;  //Armate che ha a disposizione il giocatore a inizio partita nel caso in cui ci fossero 4 giocatori
     public static final int INITIAL_ARMIES_5_PLAYERS = 25;  //Armate che ha a disposizione il giocatore a inizio partita nel caso in cui ci fossero 5 giocatori
@@ -111,7 +111,7 @@ public class MatchController {
         Player owner = territory.getOwner();
 
         //Se è il turno del giocatore e ha abbastanza armate disponibili allora piazza l'armata
-        if(match.getTurnPlayer().equals(owner) && owner.getAvailableArmies()>=1){
+        if(match.getTurnPlayer().equals(owner) && owner.getAvailableArmies()>0){
             placeArmies(territory, 1);
         }
 
@@ -201,6 +201,12 @@ public class MatchController {
 
     //L'attaccker attacca il defender con i dadi specificati nell'attributo difende.
     public void attack(int numberOfAttackerDice){
+        if(match.getAttacker() == null || match.getDefender() == null) {
+            match.setDiceAttacker(null);
+            match.setDiceDefender(null);
+            return;
+        }
+
         List<Integer> dicesAttackerList = getDicesAttacker(numberOfAttackerDice);
         List<Integer> dicesDefenderList = getDicesDefender();
 

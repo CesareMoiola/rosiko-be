@@ -22,16 +22,16 @@ public class Match {
     private Player turnPlayer;
     private int turn = 0;
     private Stage stage = Stage.INITIAL_PLACEMENT;
-    private Date date;                          //Data di creazione della partita
-    private Territory attacker;                 //Territorio dell'attaccante
-    private Territory defender;                 //Territorio del difensore
-    private String[] diceAttacker;              //Risultato del lancio dei dadi dell'attaccante
-    private String[] diceDefender;              //Risultato del lancio dei dadi del difensore
-    private Territory territoryFrom;            //Territorio dal quale spostare le armate
-    private Territory territoryTo;              //Territorio dal quale ricevere le armate spostate
-    private int moveArmies = 0;                 //Armate da spostare spostare
-    private boolean movementConfirmed = false;  //Conferma che il movimento è avvenuto
-    private boolean armiesWereAssigned = false; //Conferma che le armate sono state assegnate al giocatore di turno
+    private Date date;                              //Data di creazione della partita
+    private Territory attacker;                     //Territorio dell'attaccante
+    private Territory defender;                     //Territorio del difensore
+    private String[] diceAttacker;                  //Risultato del lancio dei dadi dell'attaccante
+    private String[] diceDefender;                  //Risultato del lancio dei dadi del difensore
+    private Territory territoryFrom;                //Territorio dal quale spostare le armate
+    private Territory territoryTo;                  //Territorio dal quale ricevere le armate spostate
+    private int moveArmies = 0;                     //Armate da spostare spostare
+    private boolean movementConfirmed = false;      //Conferma che il movimento è avvenuto
+    private boolean armiesWereAssigned = false;     //Conferma che le armate sono state assegnate al giocatore di turno
     private Player winner = null;
     private List<Card> cards = new ArrayList<>();
 

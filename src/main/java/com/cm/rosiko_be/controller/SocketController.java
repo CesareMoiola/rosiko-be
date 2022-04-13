@@ -16,6 +16,9 @@ import java.util.Map;
 @Controller
 public class SocketController {
 
+    private final int RESPONSE_DELAY = 1; //Secondi di attesa prima di inviare la risposta
+
+
     @Autowired
     public MatchController matchController;
 
@@ -75,6 +78,13 @@ public class SocketController {
     public void placeArmy(@Payload Map<String, String> json) {
         matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
         matchController.placeArmy(json.get("territoryId"));
+
+        try {
+            Thread.sleep(RESPONSE_DELAY * 1000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 
@@ -113,6 +123,13 @@ public class SocketController {
 
         matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
         matchController.attack(numberOfAttackerDice);
+
+        try {
+            Thread.sleep(RESPONSE_DELAY * 1000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 
@@ -121,10 +138,17 @@ public class SocketController {
     public void moveArmies(@Payload Map<String, String> json) {
         matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
         matchController.moveArmies(Integer.parseInt(json.get("armies")));
+
+        try {
+            Thread.sleep(RESPONSE_DELAY * 1000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 
-    /*Move armies from territory to another territory*/
+    /*Change stage to displacement*/
     @MessageMapping("/displacement_stage")
     public void displacementStage(@Payload Map<String, String> json) {
         matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
