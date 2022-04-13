@@ -16,7 +16,7 @@ import java.util.Map;
 @Controller
 public class SocketController {
 
-    private final int RESPONSE_DELAY = 1; //Secondi di attesa prima di inviare la risposta
+    private final int RESPONSE_DELAY = 0; //Secondi di attesa prima di inviare la risposta
 
 
     @Autowired
