@@ -25,6 +25,12 @@ public class WSServices {
 
     //Manda il match aggiornato ai players iscritti escluso quello passato come parametro
     public void notifyMatch (long matchId, String playerId){
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+
         Match match = matchesController.getMatch(matchId);
 
         for(Player player : match.getPlayers())
