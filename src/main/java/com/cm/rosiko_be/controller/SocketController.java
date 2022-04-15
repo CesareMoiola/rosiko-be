@@ -1,5 +1,6 @@
 package com.cm.rosiko_be.controller;
 
+import com.cm.rosiko_be.data.ArmiesToPlace;
 import com.cm.rosiko_be.data.Match;
 import com.cm.rosiko_be.services.WSServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,18 +75,14 @@ public class SocketController {
     }
 
     /*Piazza un armata*/
-    @MessageMapping("/placeArmy")
-    public void placeArmy(@Payload Map<String, String> json) {
-        matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
-        matchController.placeArmy(json.get("territoryId"));
+    @MessageMapping("/place_armies")
+    public void placeArmies(@Payload ArmiesToPlace armiesToPlace) {
+        Match match = matchesController.getMatch(armiesToPlace.getMatchId());
+        matchController.setMatch(match);
 
-        try {
-            Thread.sleep(RESPONSE_DELAY * 1000);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        matchController.placeArmies(armiesToPlace.getArmies());
 
-        wsService.notifyMatch(Long.parseLong(json.get("matchId")));
+        wsService.notifyMatch(match.getId());
     }
 
     /*Seleziona il territorio dal quale attaccare*/
@@ -133,21 +130,6 @@ public class SocketController {
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 
-    /*Move armies from territory to another territory*/
-    @MessageMapping("/move_armies")
-    public void moveArmies(@Payload Map<String, String> json) {
-        matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
-        matchController.moveArmies(Integer.parseInt(json.get("armies")));
-
-        try {
-            Thread.sleep(RESPONSE_DELAY * 1000);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-
-        wsService.notifyMatch(Long.parseLong(json.get("matchId")));
-    }
-
     /*Change stage to displacement*/
     @MessageMapping("/displacement_stage")
     public void displacementStage(@Payload Map<String, String> json) {
@@ -172,11 +154,19 @@ public class SocketController {
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 
-    /*Select territory to which to move armies*/
+    /*Ends turn and save the armies movement*/
     @MessageMapping("/ends_turn")
     public void endsTurn(@Payload Map<String, String> json) {
         matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
-        matchController.endsTurn();
+        matchController.nextTurn();
+        wsService.notifyMatch(Long.parseLong(json.get("matchId")));
+    }
+
+    /*Confirm armies movement*/
+    @MessageMapping("/confirm_move")
+    public void confirmMove(@Payload Map<String, String> json) {
+        matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
+        matchController.displacementFase(json.get("territoryFrom"), json.get("territoryTo"), Integer.parseInt(json.get("movedArmies")), false);
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
 

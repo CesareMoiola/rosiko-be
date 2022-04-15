@@ -3,6 +3,7 @@ package com.cm.rosiko_be.services;
 import com.cm.rosiko_be.controller.MatchController;
 import com.cm.rosiko_be.data.Match;
 import com.cm.rosiko_be.data.Player;
+import com.cm.rosiko_be.enums.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,10 @@ public class TimerService {
 
 
     public void startTimer(MatchController matchController){
+        Match match = matchController.getMatch();
 
         if(timer != null) timer.cancel();
+        if(match.getStage().equals(Stage.GAME_OVER)) return;
 
         timer = new Timer();
 

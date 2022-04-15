@@ -15,7 +15,7 @@ import java.util.List;
 public class Match {
     private long id;
     private String name;
-    private MatchState state;
+    private MatchState state = MatchState.WAITING;;
     private String password;
     private List<Player> players = new ArrayList<Player>();
     private GameMap map = new GameMap();
@@ -29,7 +29,7 @@ public class Match {
     private String[] diceDefender;                  //Risultato del lancio dei dadi del difensore
     private Territory territoryFrom;                //Territorio dal quale spostare le armate
     private Territory territoryTo;                  //Territorio dal quale ricevere le armate spostate
-    private int moveArmies = 0;                     //Armate da spostare spostare
+    private int moveArmies = 0;                     //Armate da spostare
     private boolean movementConfirmed = false;      //Conferma che il movimento è avvenuto
     private boolean armiesWereAssigned = false;     //Conferma che le armate sono state assegnate al giocatore di turno
     private Player winner = null;
@@ -41,9 +41,7 @@ public class Match {
     public Match(long id, String name) {
         this.name = name;
         this.id = id;
-        this.state = MatchState.WAITING;
-        Calendar cal = Calendar.getInstance();
-        date = cal.getTime();
+        this.date = Calendar.getInstance().getTime();
     }
 
 

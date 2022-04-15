@@ -73,46 +73,109 @@ public class MatchController {
         }
     }
 
-    //Passa al prossimo turno
+    //Passa alla prossima fase del turno
     public void nextStage(){
-        List<Player> players = match.getPlayers();
-        Player turnPlayer = match.getTurnPlayer();
-
         //Ferma il timer di inattività
         timerService.stopTimer();
 
         //Controlla se c'è un vincitore
         checkWinner();
 
-        //Primo turno
-        if(turnPlayer == null) match.setTurnPlayer(players.get(0));
-        else{
-            //Turni successivi
-            handleStage();
-        }
+        //Gestione del match in base alla fase di gioco
+        handleStage();
 
         //Setta i territori cliccabili in base alla fase di gioco
         setSelectable();
 
-        //Caso di vittoria
-        if(match.getStage().equals(GAME_OVER)){
-            System.out.println("GAME OVER");
-            wsServices.notifyMatch(match.getId());
+        //Fai partire il timer di inattività
+        timerService.startTimer(this);
+    }
+
+    //Gestisce l'avanzamento delle fasi nel turno di gioco in base allo stato del match
+    private void handleStage(){
+        Player turnPlayer = match.getTurnPlayer();
+
+        //Fase di piazzamento iniziale delle armate.
+        if(     match.getStage().equals(INITIAL_PLACEMENT)
+                && (turnPlayer.getArmiesPlacedThisTurn()>=INITIAL_ARMIES_TO_PLACE
+                || turnPlayer.getAvailableArmies()==0
+                || !turnPlayer.isActive()
+            )
+        ){
+            //Passa il turno solo se il giocatore ha piazzato le 3 armate
+            //Oppure non ne ha più disponibili
+            //Oppure è inattivo
+            nextTurn();
+            return;
         }
         else{
-            //Fai partire il timer di inattività
-            timerService.startTimer(this);
+            if(turnPlayer == null){
+                match.setTurnPlayer(match.getPlayers().get(0));
+                match.setStage(PLACEMENT);
+                nextTurn();
+                return;
+            }
+        }
+
+        //Fase di piazzamento delle armate.
+        if(match.getStage().equals(PLACEMENT)){
+            //Se è il primo turno che svolge il giocatore allora salta questa fase.
+            //Assegna le armate dovute al giocatore di turno
+            if(!match.isArmiesWereAssigned()) setAvailableArmies();
+
+            //Se le armate disponibili del giocatore sono esaurite allora si passa alla fase di attacco
+            if( turnPlayer.getAvailableArmies() <= 0 ) match.setStage(ATTACK);
+            return;
+        }
+
+        //Se è la fase di attacco, il territoryFrom
+        if(match.getStage().equals(ATTACK)){
+            Territory territoryFrom = match.getTerritoryFrom();
+            Territory territoryTo = match.getTerritoryTo();
+
+            //Caso di conquista
+            if(territoryFrom != null && territoryTo != null && match.isMovementConfirmed()){
+                deselectTerritories();
+                if(territoryFrom.getArmies() >= MINIMUM_ATTACKING_ARMIES) {
+                    match.setAttacker(territoryFrom);
+                }
+                if(territoryFrom.getArmies() < MINIMUM_ATTACKING_ARMIES && territoryTo.getArmies() >= MINIMUM_ATTACKING_ARMIES) {
+                    match.setAttacker(territoryTo);
+                }
+                match.setMovementConfirmed(false);
+            }
+        }
+
+        //Fase di spostamento delle armate. Il giocatore può effettuare un solo spostamento
+        if(match.getStage().equals(DISPLACEMENT)){
+            if(match.isMovementConfirmed()){
+                nextTurn();
+            }
+            return;
+        }
+
+        //Caso di vittoria
+        if(match.getStage().equals(GAME_OVER)){
+            wsServices.notifyMatch(match.getId());
         }
     }
 
-    //Piazza una armata su un territorio, poi se le condizioni sono soddisfatte passa il turno
-    public void placeArmy(String territoryId){
-        Territory territory = match.getMap().getTerritory(territoryId);
-        Player owner = territory.getOwner();
+    //Piazza le armate sui territori indicati
+    public void placeArmies(Map<String, Integer> armiesToPlace){
+        GameMap map = match.getMap();
+        Player player = match.getTurnPlayer();
+        int placeableArmies = match.getTurnPlayer().getAvailableArmies();   //Armate piazzabili
+        int placedArmies = 0;   //Armate piazzate
 
-        //Se è il turno del giocatore e ha abbastanza armate disponibili allora piazza l'armata
-        if(match.getTurnPlayer().equals(owner) && owner.getAvailableArmies()>0){
-            placeArmies(territory, 1);
+        //Controlla che il numero di armate piazzate sono corrette e che i territori siano del giocatore
+        for (Map.Entry<String, Integer> entry : armiesToPlace.entrySet()) {
+            Territory territory = map.getTerritory(entry.getKey());
+            placedArmies += entry.getValue();
+
+            //Aggiorna le armate nella mappa
+            if(placedArmies <= placeableArmies && territory.getOwner().getId().equals(player.getId())){
+                placeArmies(territory, entry.getValue());
+            }
         }
 
         nextStage();
@@ -120,9 +183,6 @@ public class MatchController {
 
     //Seleziona un proprio territorio dal quale sia possibile attaccare
     public void selectAttacker(String territoryId){
-        //Conferma i movimenti se ce ne sono
-        confirmMovement();
-
         Territory territory = match.getMap().getTerritory(territoryId);
         Player owner = territory.getOwner();
 
@@ -140,9 +200,6 @@ public class MatchController {
 
     //Seleziona un proprio territorio dal quale sia possibile attaccare
     public void selectDefender(String territoryId){
-        //Conferma i movimenti se ce ne sono
-        confirmMovement();
-
         Territory territory = match.getMap().getTerritory(territoryId);
 
         //Se il territorio è confinante con l'attaccante setta il territorio come difensore
@@ -156,10 +213,6 @@ public class MatchController {
 
     //Deseleziona un territorio che sia quello attaccante o quello difensivo
     public void deselectTerritory(String territoryId){
-
-        //Conferma i movimenti se ce ne sono
-        confirmMovement();
-
         //Se il territorio è quello attaccante lo deseleziona e deseleziona pure quello difensivo
         if(match.getAttacker()!= null && match.getAttacker().getId().equals(territoryId)){
             match.setAttacker(null);
@@ -187,16 +240,10 @@ public class MatchController {
 
     //Deseleziona tutti i territori
     private void deselectTerritories(){
-
-        //Conferma i movimenti se ce ne sono
-        confirmMovement();
-
         match.setAttacker(null);
         match.setDefender(null);
         match.setTerritoryFrom(null);
         match.setTerritoryTo(null);
-
-        nextStage();
     }
 
     //L'attaccker attacca il defender con i dadi specificati nell'attributo difende.
@@ -245,25 +292,15 @@ public class MatchController {
 
         //Caso di conquista
         conquest(dicesAttackerList.size());
-    }
 
-    //Sposta le armate da un territorio a un altro
-    public void moveArmies(int armies){
-        Territory territoryFrom = match.getTerritoryFrom();
-        Territory territoryTo = match.getTerritoryTo();
-
-        //Sposta solo se i territori sono confinanti e se il numero di armate è coerente
-        if(territoryFrom.isBordering(territoryTo)
-            && territoryFrom.getArmies() - armies >= MIN_ARMIES_FOR_TERRITORY
-            && territoryTo.getArmies() + armies >= MIN_ARMIES_FOR_TERRITORY) {
-            match.setMoveArmies(armies);
-        }
+        nextStage();
     }
 
     //Inizia la dase di spostamento
     public void displacementStage(){
         deselectTerritories();
         match.setStage(DISPLACEMENT);
+        nextStage();
     }
 
     //Seleziona il territorio dal quale spostare le armate
@@ -292,12 +329,6 @@ public class MatchController {
         }
 
         nextStage();
-    }
-
-    //Termina il turno
-    public void endsTurn(){
-        //Passa il turno
-        nextTurn();
     }
 
     //Gioca il tris nel caso sia il proprio turno ed è la fase del piazzamento delle armate
@@ -452,6 +483,7 @@ public class MatchController {
         }
 
         match.setPlayers(orderedPlayers);
+        match.setTurnPlayer(match.getPlayers().get(0));
     }
 
     //Assegnamento iniziale delle armate a tutti i giocatori in base a quanti sono
@@ -535,56 +567,6 @@ public class MatchController {
         }
     }
 
-    //Gestisce l'avanzamento delle fasi nel turno di gioco in base allo stato del match
-    private void handleStage(){
-        Player turnPlayer = match.getTurnPlayer();
-
-        //Fase di piazzamento iniziale delle armate.
-        //Passa il turno solo se il giocatore ha piazzato le 3 armate
-        //Oppure non ne ha più disponibili
-        //Oppure è inattivo
-        if(     match.getStage().equals(INITIAL_PLACEMENT)
-                && (turnPlayer.getArmiesPlacedThisTurn()>=INITIAL_ARMIES_TO_PLACE
-                || turnPlayer.getAvailableArmies()==0
-                || !turnPlayer.isActive()
-                )
-        ){
-            //resetta le armate piazzate nel turno
-            turnPlayer.setArmiesPlacedThisTurn(0);
-
-            //Setta il giocatore successivo che deve piazzare le armate
-            Player nextPlayer = nextPlayerWithAvailableArmies();
-            if(nextPlayer != null)  match.setTurnPlayer(nextPlayer);
-            else { //Nel caso non ci siano più giocatori con armate disponibili si passa alla prossima fase del gioco
-
-                //Imposta il primo giocatore
-                match.setTurnPlayer(match.getPlayers().get(0));
-
-                //Setta il primo turno
-                match.setTurn(1);
-                match.setStage(PLACEMENT);
-            }
-        }
-
-        //Fase di piazzamento delle armate.
-        //Se è il primo turno che svolge il giocatore allora salta questa fase.
-        if(match.getStage().equals(PLACEMENT)){
-
-            //Assegna le armate dovute al giocatore di turno
-            if(!match.isArmiesWereAssigned()) setAvailableArmies();
-
-            //Se le armate disponibili del giocatore sono esaurite allora si passa alla fase di attacco
-            if( turnPlayer.getAvailableArmies() <= 0 ) match.setStage(ATTACK);
-        }
-
-        //Fase di spostamento delle armate. Il giocatore può effettuare un solo spostamento
-        if(match.getStage().equals(DISPLACEMENT)){
-            if(match.isMovementConfirmed()){
-                nextTurn();
-            }
-        }
-    }
-
     //Calcola e assegna le armate disponibili per il piazzamento al giocatore di turno.
     private void setAvailableArmies(){
         Player player = match.getTurnPlayer();
@@ -592,7 +574,7 @@ public class MatchController {
         List<Continent> continentsOwned = match.getContinentsOwned(player);
 
         //Se è il primo turno del giocatore allora non vengono assegnate armate
-        if( match.getTurn() <= match.getPlayers().size()) return;
+        if( match.getTurn() < match.getPlayers().size()) return;
 
         //Armate disponibili in base al numero di territori posseduti dal giocatore
         int armiesAvailable = territoriesCounter / TERRITORIES_FOR_AN_ARMY;
@@ -612,7 +594,6 @@ public class MatchController {
 
     //Individua in base alla fase di gioco i territori cliccabili dal giocatore
     private void setSelectable(){
-
         //Azzera i selezionabili
         for (Territory territory: match.getMap().getTerritories()) {
             territory.setClickable(false);
@@ -629,6 +610,13 @@ public class MatchController {
 
         //Fase di attacco
         if(match.getStage().equals(ATTACK)){
+            //Se bisogna fare lo spostamento perché si è conquistato un territorio non sono selezionabili altri territori
+            if(     match.getTerritoryFrom() != null
+                    && match.getTerritoryTo() != null
+                    && match.getTerritoryFrom().getOwner().getId().equals(match.getTerritoryTo().getOwner().getId())
+                    && match.getTerritoryFrom().getArmies() > MIN_ARMIES_FOR_TERRITORY
+            ) return;
+
             //Va selezionato un attaccante
             if(match.getAttacker() == null){
                 for(Territory territory : match.getMap().getTerritories()){
@@ -734,44 +722,26 @@ public class MatchController {
         Player player = match.getTurnPlayer();
         Player enemy = defender.getOwner();
 
+        /*Se il difensore non ha più armate, l'attaccante diventa il proprietario del territorio
+        e ci vengono trasferite le armate che hanno attaccato*/
         if(defender.getArmies() <= 0){
             defender.setOwner(attacker.getOwner());
             match.setTerritoryFrom(match.getAttacker());
             match.setTerritoryTo(match.getDefender());
-            moveArmies(attackArmies);
+            moveArmies(match.getTerritoryFrom(), match.getTerritoryTo(), attackArmies, false);
             player.setMustDrawACard(true);     //A fine turno il giocatore potrà pescare una carta
-        }
+            match.setMovementConfirmed(false);
 
-        //Controlla se il giocatore sconfitto ha perso tutti i territori
-        List<Territory> territories = match.getTerritoriesOwned(enemy);
-        if(territories.size() == 0){
-            player.addDefeatedPlayer(enemy);
-            player.addCards(enemy.takeCards());
-            enemy.setActive(false);
-        }
-
-        //Controlla se c'è un vincitore
-        checkWinner();
-    }
-
-    //Conferma il movimento
-    private void confirmMovement(){
-
-        Territory territoryFrom = match.getTerritoryFrom();
-        Territory territoryTo = match.getTerritoryTo();
-
-        if(match.getMoveArmies() > 0 && territoryFrom != null && territoryTo != null){
-
-            int armies = match.getMoveArmies();
-
-            territoryFrom.removeArmies(armies);
-            territoryTo.addArmies(armies);
-            match.setMoveArmies(0);
-
-            if(match.getStage().equals(DISPLACEMENT)) {
-                match.setMovementConfirmed(true);
-                nextTurn();
+            //Controlla se il giocatore sconfitto ha perso tutti i territori
+            List<Territory> territories = match.getTerritoriesOwned(enemy);
+            if(territories.size() == 0){
+                player.addDefeatedPlayer(enemy);
+                player.addCards(enemy.takeCards());
+                enemy.setActive(false);
             }
+
+            //Controlla se c'è un vincitore
+            checkWinner();
         }
     }
 
@@ -783,45 +753,74 @@ public class MatchController {
         //Se il giocatore ha conquistato un territorio in questo turno allora pesca la carta
         if(player.isMustDrawACard()) drawACard(player);
 
-        //Imposta il prossimo giocatore come giocatore di turno
-        match.setTurnPlayer(nextPlayer());
-
-        //Incrementa il turno
-        turn++;
-        match.setTurn(turn);
-
-        //Imposta il primo stage
-        match.setStage(PLACEMENT);
-
         //Resetta i parametri
+        player.setArmiesPlacedThisTurn(0);
         match.setMovementConfirmed(false);
         match.setArmiesWereAssigned(false);
         deselectTerritories();
 
-        //Gestisci le fasi di gioco
+        /*Incrementa il turno (nel caso non sia la fase di piazzamento iniziale delle armate)*/
+        if(!match.getStage().equals(INITIAL_PLACEMENT)) match.setTurn(turn + 1);
+
+        //Setta la prima fase del turno
+        if(!match.getStage().equals(INITIAL_PLACEMENT)) match.setStage(PLACEMENT);
+
+        //Imposta il prossimo giocatore come giocatore di turno
+        if(match.getStage().equals(INITIAL_PLACEMENT)) {
+            Player nextPlayer = nextPlayerWithAvailableArmies();
+            if(nextPlayer == null){
+                match.setStage(PLACEMENT);
+                nextPlayer = firstActivePlayer();
+            }
+            match.setTurnPlayer(nextPlayer);
+        }
+        else match.setTurnPlayer(nextPlayer());
+
         nextStage();
     }
 
     //Ritorna il giocatore attivo successivo
-    public Player nextPlayer(){
+    private Player nextPlayer(){
         List<Player> players = match.getPlayers();
         Player turnPlayer = match.getTurnPlayer();
         Player nextPlayer = null;
+
         int index = players.indexOf(turnPlayer);
         boolean playerFound = false;
 
         while(!playerFound){
             //Seleziona giocatore successivo
             index++;
-            if(index>=players.size()) index = 0;
+            if(index >= players.size()) index = 0;
             nextPlayer = players.get(index);
             playerFound = nextPlayer.isActive();
             if(nextPlayer.equals(turnPlayer)) {
-                playerFound = true;
-                nextPlayer = null;
-            }
+                    playerFound = true;
+                    nextPlayer = null;
+                }
         }
+
         return nextPlayer;
+    }
+
+    //Ritorna il primo giocatore attivo
+    private Player firstActivePlayer(){
+        List<Player> players = match.getPlayers();
+        Player firstActivePlayer = null;
+
+        int index = 0;
+        boolean playerFound = false;
+
+        while(!playerFound){
+            if(index >= players.size()) return null;
+            if(players.get(index).isActive()){
+                firstActivePlayer = players.get(index);
+                playerFound = true;
+            }
+            index++;
+        }
+
+        return firstActivePlayer;
     }
 
     //Ritorna il giocatore attivo successivo
@@ -846,7 +845,7 @@ public class MatchController {
     }
 
     //Controlla se è stato raggiunto un obiettivo
-    public void checkWinner(){
+    private void checkWinner(){
 
         List<Player> activePlayers = match.getActivePlayers();
 
@@ -919,11 +918,14 @@ public class MatchController {
         //Controlla se ci sono giocatori attivi
         List<Player> activePlayers = match.getActivePlayers();
 
+        //Se è rimasto un solo giocatore attivo diventa il vincitore
         if(activePlayers.size() == 1){
             Player player = activePlayers.get(0);
             match.setWinner(player);
             nextPlayer = player;
         }
+
+        //Cicla finché non trova il porssimo giocatore con armate disponibili
         if(activePlayers.size() > 1){
             while (nextPlayer == null && !currentPlayer.getId().equals(turnPlayer.getId())){
                 if(currentPlayer.getAvailableArmies() > 0) nextPlayer = currentPlayer;
@@ -939,4 +941,35 @@ public class MatchController {
     }
 
     public Match getMatch(){return this.match;}
+
+    //Fase di spostamento delle armate, indica le armate da spostare
+    public void displacementFase(String territoryFromId, String territoryToId, int armies, boolean deselectAfterMove){
+        Territory territoryFrom = match.getMap().getTerritory(territoryFromId);
+        Territory territoryTo = match.getMap().getTerritory(territoryToId);
+
+        moveArmies(territoryFrom, territoryTo, armies, deselectAfterMove);
+
+        nextStage();
+    }
+
+    //Sposta le armate da un territorio a un altro
+    private void moveArmies(Territory territoryFrom, Territory territoryTo, int armies, boolean deselectAfterMove){
+        //Sposta solo se i territori sono confinanti e se il numero di armate è coerente
+        if( territoryFrom != null
+            && territoryTo != null
+            && territoryFrom.isBordering(territoryTo)
+            && territoryFrom.getArmies() - armies >= MIN_ARMIES_FOR_TERRITORY
+            && territoryTo.getArmies() + armies >= MIN_ARMIES_FOR_TERRITORY
+            && armies > 0
+        ) {
+
+            territoryFrom.removeArmies(armies);
+            territoryTo.addArmies(armies);
+
+            //Se il flag è true deseleziona tutti i territori
+            if(deselectAfterMove) deselectTerritories();
+
+            match.setMovementConfirmed(true);
+        }
+    }
 }
