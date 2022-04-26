@@ -34,7 +34,7 @@ public class TimerService {
                 Player player = match.getTurnPlayer();
 
                 player.setActive(false);
-                matchController.nextStage();
+                matchController.nextTurn();
                 if(match.getWinner() == null) wsServices.notifyMatch(match.getId());
                 stopTimer();
             }

@@ -112,7 +112,7 @@ public class MatchController {
             if(turnPlayer == null){
                 match.setTurnPlayer(match.getPlayers().get(0));
                 match.setStage(PLACEMENT);
-                nextTurn();
+                //nextTurn(); Loop
                 return;
             }
         }
@@ -300,6 +300,7 @@ public class MatchController {
     public void displacementStage(){
         deselectTerritories();
         match.setStage(DISPLACEMENT);
+        match.setMovementConfirmed(false);
         nextStage();
     }
 
@@ -949,6 +950,14 @@ public class MatchController {
 
         moveArmies(territoryFrom, territoryTo, armies, deselectAfterMove);
 
+        //Dopo lo sopostamento, se è in fase di attacco seleziona come attaccante per la porssima fase il territorio con più armate che è stato coinvolto nello spostamento
+        if(match.getStage().equals(ATTACK)){
+            if(territoryFrom.getArmies() > territoryTo.getArmies()){
+                selectAttacker(territoryFrom.getId());
+            }
+            else selectAttacker(territoryTo.getId());
+        }
+
         nextStage();
     }
 
@@ -960,7 +969,7 @@ public class MatchController {
             && territoryFrom.isBordering(territoryTo)
             && territoryFrom.getArmies() - armies >= MIN_ARMIES_FOR_TERRITORY
             && territoryTo.getArmies() + armies >= MIN_ARMIES_FOR_TERRITORY
-            && armies > 0
+            && armies >= 0
         ) {
 
             territoryFrom.removeArmies(armies);
@@ -970,6 +979,17 @@ public class MatchController {
             if(deselectAfterMove) deselectTerritories();
 
             match.setMovementConfirmed(true);
+        }
+    }
+
+    public void surrender(String playerId){
+        List<Player> players = match.getPlayers();
+        for (Player player: players) {
+            if(player.getId().equals(playerId)){
+                player.setActive(false);
+                nextTurn();
+                break;
+            }
         }
     }
 }

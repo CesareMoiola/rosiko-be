@@ -32,7 +32,6 @@ public class RestController {
     @GetMapping("/get_match")
     public Match getMatch(@RequestParam String matchId){
         Match targetMatch = matchesController.getMatch(Long.parseLong(matchId));
-        System.out.println("GET MATCH: " + getMatchCounter);
         getMatchCounter++;
         return targetMatch;
     }

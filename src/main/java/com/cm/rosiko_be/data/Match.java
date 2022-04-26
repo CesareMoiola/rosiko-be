@@ -6,7 +6,6 @@ import com.cm.rosiko_be.enums.Color;
 import com.cm.rosiko_be.enums.MatchState;
 import com.cm.rosiko_be.enums.Stage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -86,6 +85,17 @@ public class Match {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public void removePlayer(String playerId){
+        Player targetPlayer = null;
+        for (Player player : players) {
+            if(player.getId().equals(playerId)){
+                targetPlayer = player;
+                break;
+            }
+        }
+        if(targetPlayer != null) players.remove(targetPlayer);
     }
 
     public GameMap getMap() {

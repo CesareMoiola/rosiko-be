@@ -184,4 +184,25 @@ public class SocketController {
         matchController.playCards(playerId, cardsId);
         wsService.notifyMatch(Long.parseLong(json.get("matchId")));
     }
+
+    /*Surrender the player*/
+    @MessageMapping("/surrender")
+    public void surrender(@Payload Map<String, String> json) {
+        matchController.setMatch(matchesController.getMatch(Long.parseLong(json.get("matchId"))));
+        String playerId = json.get("playerId");
+
+        matchController.surrender(playerId);
+        wsService.notifyMatch(Long.parseLong(json.get("matchId")));
+    }
+
+    /*Leavs match*/
+    @MessageMapping("/leaves_match")
+    public void leavesMatch(@Payload Map<String, String> json) {
+        long matchId = Long.parseLong(json.get("matchId"));
+        String playerId = json.get("playerId");
+
+        matchesController.leavesMatch(matchId, playerId);
+        wsService.notifyMatch(Long.parseLong(json.get("matchId")));
+        wsService.notifyJoinableMatches();
+    }
 }

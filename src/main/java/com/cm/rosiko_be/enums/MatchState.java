@@ -4,6 +4,6 @@ public enum MatchState {
     WAITING,
     READY,
     STARTED,
-    OVER,
+    GAME_OVER,
     ERROR
 }

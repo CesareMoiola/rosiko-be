@@ -1,11 +1,7 @@
 package com.cm.rosiko_be.controller;
 
-import com.cm.rosiko_be.dao.DAOTerritories;
-import com.cm.rosiko_be.data.Continent;
 import com.cm.rosiko_be.data.Match;
-import com.cm.rosiko_be.data.Territory;
 import com.cm.rosiko_be.enums.MatchState;
-import com.cm.rosiko_be.dao.DAOContinents;
 import com.cm.rosiko_be.enums.Stage;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
@@ -13,8 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import static com.cm.rosiko_be.controller.MatchController.MAX_PLAYERS;
+import static com.cm.rosiko_be.enums.MatchState.*;
 
 //Gestisce tutte le partite aperte
 @Component
@@ -27,15 +23,10 @@ public class MatchesController {
     private static List<Match> matchList = new ArrayList<>();
 
     public List<Match> getJoinableMatches(){
-
-        //PROVA
-        List<Continent> continents = DAOContinents.getContinents();
-        List<Territory> territories = DAOTerritories.getTerritories();
-
         List<Match> joinableMatches = new ArrayList<Match>();
         for(Match match : matchList){
             if(
-                    (match.getState().equals(MatchState.WAITING)
+                    (match.getState().equals(WAITING)
                             || match.getState().equals(MatchState.READY))
                             && match.getPlayers().size() < MAX_PLAYERS
             ) joinableMatches.add(match);
@@ -99,6 +90,14 @@ public class MatchesController {
 
         if(counter > 0){
             System.out.println("Matches removed: " + counter + ", matches active: " + matchList.size());
+        }
+    }
+
+    //Rimuove un giocatore dalla waiting room di un match
+    public void leavesMatch(long matchId, String playerId){
+        Match match = getMatch(matchId);
+        if(match.getState().equals(WAITING) || match.getState().equals(READY)){
+            match.removePlayer(playerId);
         }
     }
 }
